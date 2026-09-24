@@ -23,7 +23,9 @@
 #
 # Exit status: 0 on success / match, non-zero on build failure or hash drift.
 
-set -euo pipefail
+set -Eeuo pipefail
+
+trap 'echo "::error::reproducible-build.sh failed at line ${LINENO}: ${BASH_COMMAND}" >&2' ERR
 
 # Pinned build image. Matches contracts/rust-toolchain.toml (channel 1.85.0).
 # Pinned to an immutable multi-arch digest for byte-for-byte reproducibility.
@@ -150,3 +152,6 @@ if not ok:
     sys.exit(1)
 print("\n==> All wasm hashes match the committed expected-hashes.json")
 PY
+
+echo "==> Reproducible build checks passed."
+exit 0
